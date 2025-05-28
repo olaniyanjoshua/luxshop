@@ -1,3 +1,6 @@
+from django.http import HttpResponse
+from django.contrib import messages
+from django.contrib.auth import logout
 from django.shortcuts import render, redirect
 from item.models import Category, Item
 
@@ -24,3 +27,17 @@ def signup(request):
          form = SignupForm()
 
    return render(request, 'core/signup.html', {'form':form})
+
+
+def custom_logout(request):
+    logout(request)
+    messages.success(request, "You have been logged out.")
+    return redirect('core:login')
+
+
+
+
+
+
+
+   
