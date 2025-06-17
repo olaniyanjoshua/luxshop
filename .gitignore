@@ -1,0 +1,12 @@
+  # Ignore the SQLite database
+db.sqlite3
+
+# Ignore virtual environment
+vmarket/
+
+# Ignore environment variables file
+.env
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
