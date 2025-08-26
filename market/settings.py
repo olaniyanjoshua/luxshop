@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'core',
     'dashboard',
     'item',
+    'donations',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.unread_message_count',
             ],
         },
     },
@@ -143,3 +145,8 @@ EMAIL_HOST_USER = 'olaniyanjoshua@gmail.com'         # Your email address
 EMAIL_HOST_PASSWORD = 'pjwdfdnsyyhgdgrf'        # App password (not your Gmail password)
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+PAYSTACK_PUBLIC_KEY = 'pk_test_c85d3b1ef49e844cd9eab6b25321d34df512eca6'
+PAYSTACK_SECRET_KEY = 'sk_test_68cfdaa437bb717f7133bad25f539fc6fe9cfea8'
+

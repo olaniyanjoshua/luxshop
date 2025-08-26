@@ -1,30 +1,44 @@
 {% extends 'core/base.html' %}
 
- {% block title %}Inbox{% endblock %}
+{% block title %}Inbox{% endblock %}
 
- {% block content %} 
-    <h1 class="mb-6 text-3xl">Inbox</h1>
+{% block content %} 
+    <h1 class="text-3xl font-bold text-emerald-700 mb-6 text-center">Inbox</h1>
 
-    <div class=space-y-6>
-      {% for conversation in conversations %}
-        <a href="{% url 'conversation:detail' conversation.id %}">
-          <div class="p-6 flex bg-gray-100 rounded-xl">
-            <div class="pr-6">
-               <img src={{ conversation.item.image.url }} class="w-20 rounded-xl">
-            </div>
+    {% if conversations %}
+        <p class="mb-4 text-gray-600">
+            You have <span class="font-semibold">{{ conversations.count }}</span> conversation{{ conversations.count|pluralize }}.
+        </p>
 
-            <div>
-               {% for member in conversation.members.all %}
-                  {% if member != request.user %}
-                     <p class="mb-4"><strong>{{ member.username }}</strong> | {{ conversation.modified_at }}</p>
-                     <p> {{ conversation.item.name }}</p>
-                  {% endif %}
-               {% endfor %}
-            </div>
+        <div class="space-y-6">
+            {% for conversation in conversations %}
+                <a href="{% url 'conversation:detail' conversation.id %}">
+                    <div class="p-6 flex bg-gray-100 rounded-xl hover:bg-gray-200 transition">
+                        <div class="pr-6">
+                            <img src="{{ conversation.item.image.url }}" class="w-20 h-20 object-cover rounded-xl">
+                        </div>
 
-          </div>
-        </a>
-      {% endfor %}
-    </div>
-
+                        <div>
+                            {% for member in conversation.members.all %}
+                                {% if member != request.user %}
+                                    <p class="mb-2 text-lg font-semibold">
+                                        {{ member.username }}
+                                        <span class="text-sm text-gray-500">| {{ conversation.modified_at|date:"M d, Y H:i" }}</span>
+                                    </p>
+                                    <p class="text-gray-700">{{ conversation.item.name }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-12 bg-gray-50 rounded-xl">
+            <svg class="mx-auto mb-4 w-16 h-16 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-18 8h18"></path>
+            </svg>
+            <p class="text-lg text-gray-500">You have no inbox messages yet</p>
+        </div>
+    {% endif %}
 {% endblock %}

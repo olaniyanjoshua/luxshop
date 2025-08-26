@@ -1,31 +1,121 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Inbox{% endblock %} 
+{% block title %}Conversation{% endblock %}
 
 {% block content %}
-<h1 class="mb-6 text-3xl">Inbox</h1>
+<div class="flex flex-col h-[90vh] bg-gray-50 rounded-lg shadow-md border">
 
-<div class="space-y-6">
-  {% for message in conversation.messages.all %}
-  
-    <div class="p-6 flex {% if message.created_by == request.user %} bg-blue-100 {% else %} bg-gray-100 {% endif %} rounded-xl"> 
-      <div class="mb-4">
-         <p><strong>{{ message.created_by.username }}</strong> @ {{ message.created_at }}</p>
-         <p>{{ message.content }}</p>
-      </div>
-      
+    <!-- Header -->
+    <div class="px-6 py-4 bg-emerald-600 text-white rounded-t-lg flex items-center justify-between">
+        <h2 class="text-xl font-semibold">Conversation</h2>
+        <a href="{% url 'conversation:inbox' %}" class="text-sm underline hover:text-gray-200">← Back to Inbox</a>
     </div>
 
-  {% endfor %}
+    <!-- Messages area -->
+    <div id="messages" class="flex-1 p-6 overflow-y-auto space-y-4">
+        {% for message in conversation.messages.all %}
+            {% if message.created_by == request.user %}
+                <!-- Sent message -->
+                <div class="flex justify-end">
+                    <div class="bg-emerald-500 text-white px-4 py-2 rounded-2xl max-w-md shadow relative">
+                        <p>{{ message.content }}</p>
+
+                        <!-- Timestamp + Status -->
+                        <div class="flex items-center justify-end space-x-1 mt-1">
+                            <span class="text-xs text-gray-100">{{ message.created_at|date:"M d, H:i" }}</span>
+
+                            <!-- Sent: one gray tick -->
+                            {% if message.status == 'sent' %}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+
+                            <!-- Delivered: two gray ticks -->
+                            {% elif message.status == 'delivered' %}
+                                <div class="flex -space-x-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+
+                            <!-- Read: two blue ticks -->
+                            {% elif message.status == 'read' %}
+                                <div class="flex -space-x-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Received message -->
+                <div class="flex justify-start">
+                    <div class="bg-white px-4 py-2 rounded-2xl border max-w-md shadow">
+                        <p>{{ message.content }}</p>
+                        <span class="block text-xs text-gray-500 mt-1">
+                            {{ message.created_at|date:"M d, H:i" }}
+                        </span>
+                    </div>
+                </div>
+            {% endif %}
+        {% empty %}
+            <p class="text-gray-500 text-center">No messages yet. Start the conversation 👋</p>
+        {% endfor %}
+    </div>
+
+    <!-- Typing indicator (hidden by default) -->
+    <div id="typing-indicator" class="px-6 py-2 flex items-center space-x-2 hidden">
+        <div class="bg-gray-200 px-4 py-2 rounded-2xl">
+            <div class="flex space-x-1">
+                <span class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
+                <span class="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-150"></span>
+                <span class="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-300"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input area -->
+    <form method="post" action="." class="p-4 bg-white border-t flex items-center space-x-3">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <input type="text" 
+               name="content" 
+               placeholder="Type your message..."
+               class="flex-1 px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500"
+               required
+               oninput="showTyping()">
+
+        <button type="submit" 
+                class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-full shadow font-medium">
+            Send
+        </button>
+    </form>
 </div>
 
-<form method="POST" action="." class="mt-6">
-   {% csrf_token %}
+<script>
+    // Auto-scroll to bottom on page load
+    const messagesDiv = document.getElementById("messages");
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-   {{ form.as_p }}
+    // Typing indicator demo
+    const typingDiv = document.getElementById("typing-indicator");
+    let typingTimeout;
 
-   <button class="mt-2 py-4 px-8 text-lg bg-teal-500 hover:bg-teal-700 rounded-xl text-center">Send</button>
-
-</form>
-
+    function showTyping() {
+        typingDiv.classList.remove("hidden");
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            typingDiv.classList.add("hidden");
+        }, 2000); // Hide after 2s of no typing
+    }
+</script> 
 {% endblock %}
