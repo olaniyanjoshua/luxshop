@@ -13,4 +13,5 @@ urlpatterns = [
     path('inbox/', include('conversation.urls')),
     path('admin/', admin.site.urls),
     path('donations/', include('donations.urls')),
+    path("accounts/", include("allauth.urls")),
 ] +static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

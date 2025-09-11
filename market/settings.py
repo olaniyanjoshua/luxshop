@@ -44,6 +44,12 @@ INSTALLED_APPS = [
     'dashboard',
     'item',
     'donations',
+     "django.contrib.sites",   # required by allauth
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.facebook",
 ]
 
 MIDDLEWARE = [
@@ -54,15 +60,19 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     "allauth.account.middleware.AccountMiddleware",
+
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'market.urls'
+ROOT_URLCONF = 'market.urls' 
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / "templates"],
+        'APP_DIRS': True, 
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -150,3 +160,23 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 PAYSTACK_PUBLIC_KEY = 'pk_test_c85d3b1ef49e844cd9eab6b25321d34df512eca6'
 PAYSTACK_SECRET_KEY = 'sk_test_68cfdaa437bb717f7133bad25f539fc6fe9cfea8'
 
+
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",   # default
+    "allauth.account.auth_backends.AuthenticationBackend",  # allauth
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": "1032265679551-tabk88lnik5h2vgnenlv7daigpeujd4r.apps.googleusercontent.com",
+            "secret": "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",
+            "key": ""
+        }
+    }
+}
+
+ 

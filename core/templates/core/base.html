@@ -1,139 +1,145 @@
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>{% block title%} {% endblock %} | Luxshop</title>
-  </head>
 
-  <body
-    class="flex flex-col min-h-screen bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200 text-gray-900"
-  >
-    <nav
-      class="py-6 px-6 border-b border-gray-200 bg-emerald-600 shadow-lg sticky top-0 z-50"
-    >
+    <!-- Responsive stacking for columns -->
+    <style>
+      @media (max-width: 767px) {
+        #content-columns > * {
+          width: 100% !important;
+          display: block !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+      }
+    </style>
+
+    <title>{% block title %}{% endblock %} | Luxshop</title>
+  </head>
+  <body class="flex flex-col min-h-screen bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200 text-gray-900">
+    
+    <!-- ✅ NAVBAR -->
+    <nav class="py-6 px-6 border-b border-gray-200 bg-emerald-600 shadow-lg sticky top-0 z-50">
       <div class="flex justify-between items-center">
         <a href="/" class="text-2xl font-bold text-white">Luxshop</a>
 
         <!-- Mobile Menu Button -->
-        <button
-          id="menu-button"
-          class="md:hidden text-white focus:outline-none"
-        >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
+        <button id="menu-button" class="md:hidden text-white focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
 
         <!-- Desktop Menu -->
-        <div id="menu" class="hidden md:flex md:space-x-6 items-center">
-          <a
-            href="{% url 'item:new' %}"
-            class="text-lg font-semibold text-white hover:text-yellow-200"
-            >New Item</a
-          >
-          <a
-            href="{% url 'item:items' %}"
-            class="text-lg font-semibold text-white hover:text-yellow-200"
-            >Browse</a
-          >
+        <div id="menu" class="hidden md:flex md:space-x-4 items-center">
+          <a href="{% url 'item:new' %}"
+             class="text-lg font-semibold {% if request.resolver_match.url_name == 'new' %}text-yellow-300 underline{% else %}text-white hover:text-yellow-200{% endif %}">
+             New Item
+          </a>
+          <a href="{% url 'item:items' %}"
+             class="text-lg font-semibold {% if request.resolver_match.url_name == 'items' %}text-yellow-300 underline{% else %}text-white hover:text-yellow-200{% endif %}">
+             Browse
+          </a>
 
           {% if request.user.is_authenticated %}
-          <a
-            href="{% url 'conversation:inbox' %}"
-            class="relative px-4 py-2 rounded bg-yellow-400 text-white hover:bg-yellow-500"
-          >
-            Inbox {% if unread_count > 0 %}
-            <span
-              class="absolute -top-2 -right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full"
-            >
-              {{ unread_count }}
-            </span>
-            {% endif %}
+          <a href="{% url 'conversation:inbox' %}"
+             class="relative px-4 py-2 rounded {% if request.resolver_match.url_name == 'inbox' %}bg-yellow-500{% else %}bg-yellow-400 hover:bg-yellow-500{% endif %} text-white">
+             Inbox
+             {% if unread_count > 0 %}
+             <span class="absolute -top-2 -right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+               {{ unread_count }}
+             </span>
+             {% endif %}
           </a>
-          <a
-            href="{% url 'dashboard:index' %}"
-            class="px-4 py-2 rounded bg-emerald-700 text-white hover:bg-emerald-800"
-            >Dashboard</a
-          >
-          <a
-            href="{% url 'core:logout' %}"
-            class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
-            >Logout</a
-          >
+          <a href="{% url 'dashboard:index' %}"
+             class="px-4 py-2 rounded {% if request.resolver_match.url_name == 'index' %}bg-emerald-800{% else %}bg-emerald-700 hover:bg-emerald-800{% endif %} text-white">
+             Dashboard
+          </a>
+          <a href="{% url 'core:logout' %}"
+             class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600">
+             Logout
+          </a>
           {% else %}
-          <a
-            href="{% url 'core:signup' %}"
-            class="px-4 py-2 rounded bg-emerald-700 text-white hover:bg-emerald-800"
-            >Sign Up</a
-          >
-          <a
-            href="{% url 'core:login' %}"
-            class="px-4 py-2 rounded bg-emerald-700 text-white hover:bg-emerald-800"
-            >Log In</a
-          >
+          <div class="flex items-center space-x-3">
+            <a href="{% url 'core:signup' %}"
+               class="px-5 py-2 rounded-lg {% if request.resolver_match.url_name == 'signup' %}bg-emerald-900{% else %}bg-gradient-to-r from-emerald-700 to-emerald-800 hover:from-emerald-800 hover:to-emerald-900{% endif %} text-white font-medium shadow-md transition">
+               Sign Up
+            </a>
+            <a href="{% url 'core:login' %}"
+               class="px-5 py-2 rounded-lg {% if request.resolver_match.url_name == 'login' %}bg-emerald-900{% else %}bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800{% endif %} text-white font-medium shadow-md transition">
+               Log In
+            </a>
+            {% if request.path == "/" or request.path == "/login/" %}
+            <span class="text-white font-semibold">or</span>
+            <a href="{% provider_login_url 'google' %}" aria-label="Continue with Google"
+               class="flex items-center gap-2 px-5 py-2 rounded-lg bg-white text-gray-700 font-medium border hover:bg-gray-100 shadow-md transition">
+              <img src="https://www.svgrepo.com/show/355037/google.svg"
+                   alt="Google" class="w-5 h-5" />
+              Continue with Google
+            </a>
+            {% endif %}
+          </div>
           {% endif %}
         </div>
       </div>
 
       <!-- Mobile Menu -->
       <div id="mobile-menu" class="md:hidden hidden mt-4 space-y-2">
-        <a
-          href="{% url 'item:new' %}"
-          class="block text-lg font-semibold text-white hover:text-yellow-200"
-          >New Item</a
-        >
-        <a
-          href="{% url 'item:items' %}"
-          class="block text-lg font-semibold text-white hover:text-yellow-200"
-          >Browse</a
-        >
-
-        {% if request.user.is_authenticated %}
-        <a
-          href="{% url 'conversation:inbox' %}"
-          class="relative block px-4 py-2 rounded bg-yellow-400 text-white hover:bg-yellow-500"
-        >
-          Inbox {% if unread_count > 0 %}
-          <span
-            class="absolute -top-2 -right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full"
-          >
-            {{ unread_count }}
-          </span>
-          {% endif %}
+        <a href="{% url 'item:new' %}"
+           class="block text-lg font-semibold {% if request.resolver_match.url_name == 'new' %}text-yellow-300 underline{% else %}text-white hover:text-yellow-200{% endif %}">
+           New Item
         </a>
-        <a
-          href="{% url 'dashboard:index' %}"
-          class="block px-4 py-2 rounded bg-teal-700 text-white hover:bg-teal-800"
-          >Dashboard</a
-        >
-        <a
-          href="{% url 'core:logout' %}"
-          class="block px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
-          >Logout</a
-        >
+        <a href="{% url 'item:items' %}"
+           class="block text-lg font-semibold {% if request.resolver_match.url_name == 'items' %}text-yellow-300 underline{% else %}text-white hover:text-yellow-200{% endif %}">
+           Browse
+        </a>
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'conversation:inbox' %}"
+           class="relative block px-4 py-2 rounded {% if request.resolver_match.url_name == 'inbox' %}bg-yellow-500{% else %}bg-yellow-400 hover:bg-yellow-500{% endif %} text-white">
+           Inbox
+           {% if unread_count > 0 %}
+           <span class="absolute -top-2 -right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+             {{ unread_count }}
+           </span>
+           {% endif %}
+        </a>
+        <a href="{% url 'dashboard:index' %}"
+           class="block px-4 py-2 rounded {% if request.resolver_match.url_name == 'index' %}bg-emerald-800{% else %}bg-teal-700 hover:bg-teal-800{% endif %} text-white">
+           Dashboard
+        </a>
+        <a href="{% url 'core:logout' %}"
+           class="block px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600">
+           Logout
+        </a>
         {% else %}
-        <a
-          href="{% url 'core:signup' %}"
-          class="block px-4 py-2 rounded bg-emerald-700 text-white hover:bg-emerald-800"
-          >Sign Up</a
-        >
-        <a
-          href="{% url 'core:login' %}"
-          class="block px-4 py-2 rounded bg-emerald-700 text-white hover:bg-emerald-800"
-          >Log In</a
-        >
+        <div class="flex flex-col items-center space-y-2">
+          <a href="{% url 'core:signup' %}"
+             class="block px-5 py-2 rounded-lg {% if request.resolver_match.url_name == 'signup' %}bg-emerald-900{% else %}bg-gradient-to-r from-emerald-700 to-emerald-800 hover:from-emerald-800 hover:to-emerald-900{% endif %} text-white font-medium shadow-md transition w-full text-center">
+             Sign Up
+          </a>
+          <a href="{% url 'core:login' %}"
+             class="block px-5 py-2 rounded-lg {% if request.resolver_match.url_name == 'login' %}bg-emerald-900{% else %}bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800{% endif %} text-white font-medium shadow-md transition w-full text-center">
+             Log In
+          </a>
+          {% if request.path == "/" or request.path == "/login/" %}
+          <div class="flex items-center w-full my-2">
+            <hr class="flex-grow border-gray-300" />
+            <span class="px-2 text-gray-500 text-sm">or</span>
+            <hr class="flex-grow border-gray-300" />
+          </div>
+          <a href="{% provider_login_url 'google' %}" aria-label="Continue with Google"
+             class="flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-white text-gray-700 font-medium border hover:bg-gray-100 shadow-md transition w-full">
+            <img src="https://www.svgrepo.com/show/355037/google.svg"
+                 alt="Google" class="w-5 h-5" />
+            Continue with Google
+          </a>
+          {% endif %}
+        </div>
         {% endif %}
       </div>
 
@@ -147,69 +153,31 @@
       </script>
     </nav>
 
+    <!-- ✅ MAIN CONTENT -->
     <div class="px-6 py-6 flex-grow">
-      {% if messages %}
-      <div class="container mx-auto mt-4">
-        {% for message in messages %}
-        <div
-          class="mb-4 p-4 rounded text-white {% if message.tags == 'success' %} bg-green-500 {% elif message.tags == 'error' %} bg-red-500 {% else %} bg-blue-500 {% endif %}"
-        >
-          {{ message }}
-        </div>
-        {% endfor %}
+      <div id="content-columns">
+        {% block content %}{% endblock %}
       </div>
-      {% endif %} {% block content %} {% endblock %}
     </div>
-    {% if request.path == '/donations/donate/' or request.path == '/donations/verify/' %}
-  {# hide the banner #}
-{% else %}
-  <div class="px-6 py-6 bg-emerald-100 text-center">
-    <a
-      href="{% url 'donations:make_donation' %}"
-      class="inline-block bg-emerald-700 text-white px-6 py-2 rounded hover:bg-emerald-800"
-    >
-      Donate to Luxshop
-    </a>
-  </div>
-{% endif %}
 
-    <footer class="px-6 py-10 bg-emerald-800 text-white">
-      <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-8">
-        <div>
-          <h3 class="text-xl font-semibold mb-4">About</h3>
-          <p class="text-gray-300">
-            Luxshop is your go-to platform for stylish and affordable items.
-            Discover new arrivals and connect with sellers easily.
-          </p>
-        </div>
-        <div>
-          <h3 class="text-xl font-semibold mb-4">Menu</h3>
-          <ul class="space-y-2">
-            <li><a href="#" class="hover:text-yellow-400">About</a></li>
-            <li>
-              <a href="{% url 'core:contact' %}" class="hover:text-yellow-400"
-                >Contact</a
-              >
-            </li>
-            <li>
-              <a href="#" class="hover:text-yellow-400">Privacy Policy</a>
-            </li>
-            <li><a href="#" class="hover:text-yellow-400">Terms of Use</a></li>
-          </ul>
-        </div>
+    <!-- ✅ CATEGORIES SECTION -->
+    <div class="px-6 py-6">
+      <h2 class="text-xl font-bold mb-4 text-center">Categories</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {% block categories %}
+          {% for category in categories %}
+            <div class="bg-white rounded-lg shadow-md p-6 text-center break-words">
+              <h3 class="font-semibold text-lg">{{ category.name }}</h3>
+              <p class="text-gray-500 text-sm">items</p>
+            </div>
+          {% endfor %}
+        {% endblock %}
       </div>
-    </footer>
+    </div>
 
-    <style>
-      img {
-        width: 100%;
-        max-width: 300px;
-        height: 300px;
-        object-fit: cover;
-        padding: 12px;
-        background-color: white;
-        border-radius: 0.5rem;
-      }
-    </style>
+    <!-- ✅ FOOTER -->
+    <footer class="py-6 px-6 bg-emerald-700 text-center text-white">
+      <p>&copy; 2025 Luxshop. All rights reserved.</p>
+    </footer>
   </body>
 </html>
