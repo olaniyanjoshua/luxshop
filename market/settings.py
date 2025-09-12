@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+from decouple import config
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +20,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5f7_w3s419^73a7@qs&ki(mpi)d7$(k9m3-83rs&wizsbymp0-'
+
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+
+DEBUG = config("DEBUG", default=True, cast=bool)
+
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="", cast=lambda v: v.split(","))
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -151,14 +154,14 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = 'olaniyanjoshua@gmail.com'         # Your email address
-EMAIL_HOST_PASSWORD = 'pjwdfdnsyyhgdgrf'        # App password (not your Gmail password)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")      # Your email address
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")       # App password (not your Gmail password)
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-PAYSTACK_PUBLIC_KEY = 'pk_test_c85d3b1ef49e844cd9eab6b25321d34df512eca6'
-PAYSTACK_SECRET_KEY = 'sk_test_68cfdaa437bb717f7133bad25f539fc6fe9cfea8'
+PAYSTACK_PUBLIC_KEY =  config("PAYSTACK_PUBLIC_KEY")
+PAYSTACK_SECRET_KEY =  config("PAYSTACK_SECRET_KEY")
 
 
 
@@ -172,8 +175,8 @@ AUTHENTICATION_BACKENDS = [
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {
-            "client_id": "1032265679551-tabk88lnik5h2vgnenlv7daigpeujd4r.apps.googleusercontent.com",
-            "secret": "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",
+            "client_id": config("GOOGLE_CLIENT_ID"),
+            "secret": config('GOOGLE_CLIENT_SECRET'),
             "key": ""
         }
     }
